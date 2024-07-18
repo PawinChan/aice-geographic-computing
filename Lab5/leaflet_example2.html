@@ -1,0 +1,358 @@
+<!DOCTYPE html> 
+<html>
+<!--
+  --  Simple example of Leaflet map embedding
+  --  Uses OSM data, based EMTAlert plus example at:
+  --   http://leafletjs.com/examples/quick-start/
+  --  Created by Sally Goldin, 13 September 2017
+  --  Added code for Lesson 11 Assignment 11 Oct 2017
+  -->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      .center { margin: auto; }
+      html { height: 100%; margin: 0px; padding: 0px; }
+      body { height: 100%; margin: 0px; padding: 0px;
+             background-color:#DDFFFF;
+             font-family: sans-serif;
+           }
+      #header         { background-color: #DDFFFF;
+                        margin: 0px;
+                        padding: 0px;
+                        text-align: center;
+                        line-height: 150%;
+                        }
+      #map-canvas    { 
+                        width: 95%; 
+                        height: 500px;
+                        border-style: inset; 
+                        border-width: 4px 
+                     }
+
+      #titlebar      {
+                        width : 100%;
+                        height : 20px;
+                        background-color : #DDDDDD;
+                        border-style: solid;
+                        border-width: 2px;
+                        border-color: black;
+                     }
+
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>    
+    <!-- Leaflet JS library -->
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <!-- GeoJSON data for Amphawa tourist sites.
+         We could set this up to pull from a server.
+     -->
+<script>
+marker = null
+var geojson_touristsites = 
+{"type":"FeatureCollection","features":[
+    {"type":"Feature","id":"touristsites.25",
+    "geometry":{"type":"Point","coordinates":[99.95056,13.42028]},"geometry_name":"geometry",
+    "properties":{"name_th":"บ้านดนตรี","name_en":"House of Music","categoryid":7,"desc_en":"This school building is used for instructing students in traditional Thai music. The Samut Songkhram Primary School Office has envisioned that the cultural value of folk wisdom should be preserved for and inherited by the next generation for their pride in the future.","photoid":43,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-06-16T04:51:12Z"}},
+    {"type":"Feature","id":"touristsites.1",
+    "geometry":{"type":"Point","coordinates":[99.955,13.42472]},"geometry_name":"geometry",
+    "properties":{"name_th":"ตลาดน้ำยามเย็นอัมพวา","name_en":"Amphawa Night Floating Market","categoryid":1,"desc_en":"The Amphawa Floating Market is an afternoon floating market by the canal near Wat Amphawan Chetiyaram (parking area is available). On Friday, Saturday and Sunday, from noon to 8.00 p.m., the Amphawa Canal is occupied by vendors who pack their boats with food and drinks, such as fried sea mussels, noodles, coffee, O-liang (iced black coffee), sweets, etc. There are also things for sale on wheelbarrows on the bank. Visitors can enjoy a cozy atmosphere and music broadcast by the community members, explore the market, have food, and hire a boat to see fireflies at night.","photoid":41,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-06-16T08:32:21Z"}},
+    {"type":"Feature","id":"touristsites.10",
+    "geometry":{"type":"Point","coordinates":[99.994533,13.378138]},"geometry_name":"geometry",
+    "properties":{"name_th":"วัดศรัทธาธรรม","name_en":"Wat Satthatham","categoryid":2,"desc_en":"The ordination hall is made of golden teak with mother-of-pearl-inlay walls, both inside and outside. Housed inside the ordination hall are Buddha images: Luangpho Ban Laem, Luangpu Thuat Yiap Nam Thale Chuet, and Luangpho Phuttha Sothon.","photoid":58,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.20",
+    "geometry":{"type":"Point","coordinates":[100,13.407509]},"geometry_name":"geometry",
+    "properties":{"name_th":"ตลาดร่มหุบ","name_en":"Folding Umbrella Market","categoryid":1,"desc_en":"Mae Klong market – or “Folding Umbrella Market” - in addition to being a place to shop for people in this area, also offers a unique and thrilling experience. Although it looks like an ordinary common market, the market is located on both sides of the Laem - Mae Klong railway line. Merchants sell their products under umbrellas or canvas awnings that straddle the tracks. When a train is coming, the merchants feel the vibrations and suddenly close their umbrellas to make room for the train to pass. Shoppers and merchants have to stop trading for a while waiting for tracks to become clear. The sight and sound of dozens of umbrellas suddenly folding up can be quite exciting.","photoid":0,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.24",
+    "geometry":{"type":"Point","coordinates":[99.954214,13.426272]},"geometry_name":"geometry",
+    "properties":{"name_th":"วัดอัมพวันเจติยาราม","name_en":"Wat Amphawan Chediyaram","categoryid":2,"desc_en":"This temple is associated with the royal lineage of Bang Chang. The back of this temple was once a residence of Luang Yokkrabat (King Rama I) and Khun Nak (Queen Ammarinthramat of King Rama I). The Ubosot (ordination hall) and permanent structures within the temple were mostly designed in the early Rattanakosin style of art and architecture.","photoid":50,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.8",
+    "geometry":{"type":"Point","coordinates":[99.94806,13.43306]},"geometry_name":"geometry",
+    "properties":{"name_th":"วัดบางแคน้อย","name_en":"Wat Bang Khae Noi","categoryid":2,"desc_en":"Wat Bang Khae Noi is located in Tambon Khwae Om by the Mae Klong River. This temple was built by Khunying Chui (Noi) Wongsarot in 1868. Initially, the Ubosot (ordination hall) was built on a bamboo raft tied to a Bodhi tree on the river bank. At present, the temple is well restored. The most interesting thing is the ordination hall, which has inside walls where woodcarvings depict the Lord Buddha’s history, birth, enlightenment, and nirvana, as well as stories of the Lord Buddha’s Ten Incarnations or Jatakas. The beautiful and explicit design was made by craftsmen from Phetchaburi province where woodcarving was famous.","photoid":51,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.21",
+    "geometry":{"type":"Point","coordinates":[99.95722,13.42417]},"geometry_name":"geometry",
+    "properties":{"name_th":"ถนนคนเดินอัมพวา","name_en":"Amphawa Walking Street","categoryid":1,"desc_en":"The narrow sois leading away from the Amphawa Floating Market are lined with more shops selling local food and handicrafts products. At night, cars are banned and many vendors set up stalls to sell their wares to visitors.","photoid":42,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.3",
+    "geometry":{"type":"Point","coordinates":[99.995331,13.471878]},"geometry_name":"geometry",
+    "properties":{"name_th":"ตลาดน้ำท่าคา","name_en":"Tha Kha Floating Market","categoryid":1,"desc_en":"This floating market still is part of the villagers’ way of life. The villagers here do farming and grow various plants. They usually paddle a boat to bring their produce to sell to each other.","photoid":0,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-06-16T04:51:48Z"}},
+    {"type":"Feature","id":"touristsites.18",
+    "geometry":{"type":"Point","coordinates":[99.955523,13.427127]},"geometry_name":"geometry",
+    "properties":{"name_th":"โครงการอัมพวาชัยพัฒนานุรักษ์","name_en":"Amphawa Chai Pattana Conservation Project","categoryid":7,"desc_en":"Initiated by HRH Princess Maha Chakri Sirindhorn, the Amphawa Anurak project focuses on the preservation of both the environment and traditional culture. The project emphasizes the concepts of the sufficiency economy, and includes areas for demonstration farming as well as a community shop selling local products.","photoid":40,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.4",
+    "geometry":{"type":"Point","coordinates":[100.022496,13.362501]},"geometry_name":"geometry",
+    "properties":{"name_th":"ดอนหอยหลอด","name_en":"Don Hoi Lot","categoryid":7,"desc_en":"Don Hoi Lot is a sandbar off the coast of Samut Songkhram Province at the northwestern tip of the Bay of Bangkok. The sediments of the Mae Klong River together sediments from the sea form a system of mudflats, which are occupied by razor clams  (Solen regularis), which also give the site its Thai name. The site has the largest population of this shell species, which is endemic to the northern Gulf of Thailand. Also 18 bird and 42 invertebrate species have been recorded at the mudflats and the adjoining coastal mangrove forests. The mudflat Don Nai is located directly at the coast and accessible by car. At Chu Chi village several sea food restaurants offer the local shells; also the highly-revered shrine of Prince Chumphon Khet-Udomsak attracts Thai  visitors.","photoid":0,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.6",
+    "geometry":{"type":"Point","coordinates":[99.952068,13.423746]},"geometry_name":"geometry",
+    "properties":{"name_th":"อุทยานร.2","name_en":"King Rama II Park","categoryid":3,"desc_en":"King Rama II Memorial Park is a project built to honor King Rama II by the King Rama II Memorial Foundation under Royal Patronage. The construction site of the Memorial Park is important since it was a birthplace of King Rama II. King Rama II Museum is comprised of four Thai-style buildings separated into sections which display artifacts and living quarters from the early Rattanakosin era. In addition, there is an open theater and a botanical garden where plants mentioned in Thai literature have been collected. A shop here offers local products and young plants. The Park is shady with traditional Thai ambience.","photoid":49,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.14",
+    "geometry":{"type":"Point","coordinates":[99.94694,13.43111]},"geometry_name":"geometry",
+    "properties":{"name_th":"บ้านแมวไทย","name_en":"House of Thai Cats","categoryid":3,"desc_en":"Baan Maeo Thai Boran (House of Ancient Thai Cats) is a house where the species of genuine Siamese cats have been conserved. The owners care for more than one hundred cats with traditional Siamese color patterns. Information is also available on genuine features of Siamese cats. Baan Maeo supports research, exchanges knowledge and views between members, and exchanges research experiences and breeding with relevant bodies.","photoid":48,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-06-16T04:52:19Z"}},
+    {"type":"Feature","id":"touristsites.12",
+    "geometry":{"type":"Point","coordinates":[99.94111,13.44528]},"geometry_name":"geometry",
+    "properties":{"name_th":"ค่ายบางกุ้ง","name_en":"Camp Bang Kung","categoryid":7,"desc_en":"Within the camp compound, there is the Ubosot (ordination hall) commonly called \"Bot Luangpho Dam\". The hall is wholly covered by four species of ficus plants: Pho (Bodhi), Sai, Krai, and Krang. Therefore, it is also called \"Bot Prok Pho\" (ordination hall covered by Bodhi trees). A famous monument of King Taksin the Great is in its vicinity.","photoid":45,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.5",
+    "geometry":{"type":"Point","coordinates":[99.998803,13.409407]},"geometry_name":"geometry",
+    "properties":{"name_th":"วัดเพชรสมุทรวรวิหาร","name_en":"Wat Phet Samut Worawihan","categoryid":2,"desc_en":"Inside the temple compound, there is a Sangha museum with displays of Buddha images, amulets of different periods, ancient artifacts, blue-and-white porcelain, and a pulpit from the Ayutthaya period.","photoid":56,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.23",
+    "geometry":{"type":"Point","coordinates":[99.924581,13.495512]},"geometry_name":"geometry",
+    "properties":{"name_th":"อาสนวิหารแม่พระบังเกิด","name_en":"Church of the Virgin Mary","categoryid":4,"desc_en":"This cathedral is a sacred place of worship for the Christians living in the area. It is a building in the French Gothic style, coated with pounded lime. The interior is decorated with colored stained glass.","photoid":46,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.13",
+    "geometry":{"type":"Point","coordinates":[99.96278,13.41444]},"geometry_name":"geometry",
+    "properties":{"name_th":"วัดบางกะพ้อม","name_en":"Wat Bang Kaphom","categoryid":2,"desc_en":"The old Wihan (image hall) is very interesting. In the center of the hall, a large replica of four superimposed Buddha footprints in different sizes is enshrined. The footprint at the deepest level, which is made from mother-of-pearl inlaid wood, still retains its beautiful design.","photoid":52,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.17",
+    "geometry":{"type":"Point","coordinates":[99.95056,13.42028]},"geometry_name":"geometry",
+    "properties":{"name_th":"วัดภุมรินทร์กุฎีทอง","name_en":"Wat Phummarin Kudi Thong","categoryid":2,"desc_en":"The Kudi Thong, a \"golden- teak monk’s cell\", has an unusual history. The father of Khun Nak (Queen Ammarinthramat) had her fortune told by the abbot of Wat Bang Li. The abbot foretold that the daughter would become a queen. The millionaire father, therefore, promised to build a Kudi Thong for the temple if the abbot’s words proved true.","photoid":57,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.19",
+    "geometry":{"type":"Point","coordinates":[99.943764,13.462084]},"geometry_name":"geometry",
+    "properties":{"name_th":"ตลาดน้ำบางน้อย","name_en":"Bang Noi Floating Market","categoryid":1,"desc_en":"Located at the top of Bang Noi canal (Wat Koh Kaew) Bang Noi was a very important commercial district in the Mae Klong River Basin about 40 year ago. Goods sold at the market now include agricultural products from gardeners, including fruits such as lychee, mango, pomelo, rose apple, and star apple. Also available are popular sweet and savory items unique to Samut Songkhram such as Klong Klone shrimp paste and lime pickle. Chaozhou southern flat bread from Je Ranue can be found only in the Bang Noi floating market. Visitors can walk to view the canal and old wooden houses, and many enjoyable shops are located on the banks of the Bang Noi canal. There is also a rowing boat to visit the museum at Wat Sai, an old temple over 400 years old.","photoid":44,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.22",
+    "geometry":{"type":"Point","coordinates":[99.952518,13.448311]},"geometry_name":"geometry",
+    "properties":{"name_th":"วัดแก่นจันทร์เจริญ","name_en":"Wat Kaen Chan Charoen","categoryid":2,"desc_en":"Wat Kaen Chan Charoen is famous for its annual tradition of offering coconut sweets called kanom krok to the monks. The kanom krok festival, which has been going on for more than 80 years, takes place  on the eighth of the tenth lunar month, normally in earlier September. The villagers prepare sweets made from flour, sugar, and coconut, cooked in metal pans. By presenting these to the monks, the people make merit. The festival includes contests for the best sweets, also dancing, cooking demonstrations, and a boat race.","photoid":55,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.11",
+    "geometry":{"type":"Point","coordinates":[99.927434,13.501167]},"geometry_name":"geometry",
+    "properties":{"name_th":"วัดเจริญสุขาราม","name_en":"Wat Charoen Sukharam Edited","categoryid":2,"desc_en":"Within this temple, there is the Ubosot (ordination hall) built in a unique style with its ceiling curved like a boat’s roof. The hall houses Luangpho To, a Buddha image of the Sukhothai period. ","photoid":53,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.9",
+    "geometry":{"type":"Point","coordinates":[99.965629,13.426209]},"geometry_name":"geometry",
+    "properties":{"name_th":"วัดจุฬามณี","name_en":"Wat Chula Manee","categoryid":2,"desc_en":"Wat Chulamanee is an old temple on the bank of Amphawa canal established in the reign of King Prasatthong in the Ayutthaya period. It is believed that Thao Keaw Phaluk (Noi) Nai Taladbangchang, the founders of the Bang Chang’s family constructed this temple. The area behind the temple was the residential palace of Somdet Phra Amarintaramat and Somdet Phra Sri Suriyanetharamat, the royal consorts in the reign of King Rama I and King Rama II (1782-1824 A.D.)","photoid":54,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.16",
+    "geometry":{"type":"Point","coordinates":[99.890018,13.424989]},"geometry_name":"geometry",
+    "properties":{"name_th":"วัดประดู่","name_en":"Wat Pradu","categoryid":2,"desc_en":"Wat Pradu was a very old temple built in the late Ayutthaya period.  In the Rattanakosin era, King Rama V traveled by boat to Wat Pradu to pay respects to the abbot Luang Pu Jaeng, and also had his breakfast there. The principal royal offerings from the King to the temple have great value and were carefully preserved. Around 1974, the present abbot of Wat Pradu established a museum to house these royal offerings in one place. The present museum now consists of two buildings. The natural surroundings of the museum are mostly fruit orchards where for pomelos, lychees, and coconuts are grown.  A canal passes by the temple front.  In former times, it used to be the waterway or means of transportation for the Amphawa folks and those living around Wat Pleng, as the people could take their boats along the canal and go along all the way up to Ratchaburi Province.","photoid":0,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.2",
+    "geometry":{"type":"Point","coordinates":[99.90234,13.301592]},"geometry_name":"geometry",
+    "properties":{"name_th":"วัดเขายี่สาร","name_en":"Wat Khao Yi San","categoryid":2,"desc_en":"The Viharn on the hilltop is a boat-shaped hall where four Buddha footprints are enshrined. The Phra Non Cave has a reclining Buddha image with nine toes. At the lower part lies the sacred shrine of Luangpho Pu Si Racha which is respected by the villagers.","photoid":0,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}},
+    {"type":"Feature","id":"touristsites.15",
+    "geometry":{"type":"Point","coordinates":[100.026367873,13.426376]},"geometry_name":"geometry",
+    "properties":{"name_th":"อนุสรณ์สถานแฝดอิน-จัน","name_en":"Chang-Eng Siamese Twins Monument","categoryid":7,"desc_en":"The statues were built in memory of Chang and Eng, the Siamese twins who made Thailand famous around the world. Chang and Eng were joined to each other at the chest. However, both of them lived a normal life to the age of 63.","photoid":47,"created":"2014-02-25T07:34:23.032Z","last_update":"2014-02-25T07:34:23Z"}}],
+    "crs":{"type":"EPSG",
+    "properties":{"code":"3857"}}}
+
+</script>
+
+
+    <script type="text/javascript">
+      var tourismOnFlag = false;
+      var tourismLayer = null;
+
+      var map = null;   /* want to be able to see outside of initialize */
+
+     /* Initialize the map. Right now we use an arbitrary
+      * center point in Amphawa.
+      */
+     function initialize() 
+        {
+        map = L.map('map-canvas').setView([13.4248817,99.9567757],12);
+
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+           attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap           </a> contributors'
+           }).addTo(map);
+        }
+
+      /* Revise the width and height of the map area to be completely
+       * visible on the screen.
+       */
+      function adjustMapArea()
+         {
+          var elem = (document.compatMode === "CSS1Compat") ? 
+                  document.documentElement :
+                 document.body;
+         var pgheight = elem.clientHeight;
+         var pgwidth = elem.clientWidth;         
+         var header= document.getElementById("header");
+         var cparea= document.getElementById("control_panel");
+         var maparea = document.getElementById("map-canvas");
+         var box = header.getBoundingClientRect();
+         var headerheight = box.height || (box.bottom - box.top);
+         box = cparea.getBoundingClientRect();
+         var controlwidth = box.width || (box.right - box.left);
+         var margin = 40;  /* fix this if we decide to change the layout */
+         var newwidth = pgwidth - controlwidth - margin;
+         var newheight = pgheight - headerheight - margin/2;
+         maparea.style.width = newwidth+"px"; 
+         maparea.style.height = newheight+"px";
+         } 
+
+       /* create and add a new layer based on the geojson_features array
+       * defined above, or remove the layer
+       */
+      function manageTourismLayer()
+         {
+         var btn = document.getElementById("tourismButton");   
+         console.log("addTourismLayer called\n");
+         if (marker) {
+                      map.removeLayer(marker);
+         }
+
+         if (tourismLayer) {
+          console.log(`Removing tourism layer.`)
+          tourismLayer.removeLayer()
+          console.log(`Removed tourism layer.`)
+         }
+
+        tourismLayer = L.geoJSON(geojson_touristsites);
+        tourismLayer.bindPopup(function (layer) 
+                  {
+                  console.log(layer)
+                  var feature = layer.feature;
+                  let tooltiptext = `${feature.properties.name_en} ${feature.properties.name_th} <br> ${feature.geometry.coordinates}`;
+                  return tooltiptext;
+                  });
+
+         if (tourismOnFlag)
+            {
+            console.log("removing tourism layer\n");
+            map.removeLayer(tourismLayer);
+            btn.innerHTML="Show Tourism Sites";
+            if (marker)
+                {
+                map.removeLayer(marker);
+                }
+            }
+         else
+            // {
+            // console.log("adding tourism layer\n");
+            // map.addLayer(tourismLayer);
+            // btn.innerHTML="Hide Tourism Sites";
+            // }
+         tourismOnFlag = !tourismOnFlag;  
+         }
+
+      /* Show lat long if the tourism layer is NOT on */
+      function onMapClick(e) {
+        if (tourismOnFlag == false) {
+          if (marker) {
+            map.removeLayer(marker);
+            }
+          marker = L.marker([e.latlng.lat,e.latlng.lng]).addTo(map);
+          let formstuff = `<div style="width: min-content">
+            <input id="newNameTH" placeholder="Thai Name"></input><br>
+            <input id="newNameEN" placeholder="English Name"></input><br>
+            <input id="newDescription" placeholder="Description"></input><br>
+            <button onclick="addTouristAttraction()">Save</button>
+            </div>`
+
+          // marker.bindPopup("You clicked the map at " + e.latlng).openPopup();
+          marker.bindPopup(formstuff).openPopup()
+          }
+        }
+         
+      function addTouristAttraction() {
+        let newNameTH = document.getElementById('newNameTH').value
+        let newNameEN = document.getElementById('newNameEN').value
+        let newDescription = document.getElementById('newDescription').value
+        let newLat = marker.getLatLng().lat
+        let newLon = marker.getLatLng().lng
+        let randomNumber = Math.floor(Math.random() * 50)
+        let currentTimeStr = new Date().toISOString()
+
+        if (!(newNameTH && newNameEN && newDescription)) {
+          alert("Please fill in all fields.")
+          return
+        }
+        let newFeature = {
+          "type":"Feature",
+          "id":`touristsites.${randomNumber}`,
+          "geometry":{"type":"Point","coordinates":[newLon,newLat]},
+          "geometry_name":"geometry",
+          "properties":{ "name_th":newNameTH,"name_en":newNameEN,
+          "categoryid":7,"desc_en":newDescription,
+          "photoid":43,"created":currentTimeStr,"last_update":currentTimeStr}
+        }
+        geojson_touristsites.features.push(newFeature)
+        manageTourismLayer()
+      }
+      /* collect all the actions we want to do when the page loads */ 
+      function initializePage()
+         {
+         adjustMapArea(); // set the size first, otherwise some of the map
+                          // does not display
+         initialize();
+         map.on('click', onMapClick);
+         }
+
+      async function findTourismFeature() {
+        let query = document.getElementById('searchInput').value.trim()
+        if ((tourismLayer == null) || !tourismOnFlag) {
+          manageTourismLayer()
+        }
+        if (!query || query.length < 3) {
+          alert("Please something meaningful to search.")
+          return
+        }
+        for (var index in tourismLayer._layers) {
+          item = tourismLayer._layers[index]
+          let thaiName = item.feature.properties.name_th
+          let englishName = item.feature.properties.name_en
+
+          let searchFound = englishName.toLowerCase().includes(query.toLowerCase()) || thaiName.toLowerCase().includes(query.toLowerCase())
+
+          if (searchFound) {
+            let lat = item.feature.geometry.coordinates[1]
+            let lon = item.feature.geometry.coordinates[0]
+            map.flyTo([lat, lon])
+            console.log(item)
+
+            item.bindPopup(`${englishName} ${thaiName} <br> ${item.feature.geometry.coordinates}`).openPopup()
+            return
+          }
+        }
+        alert("No result found.")
+
+      }
+      window.onload = setTimeout("initializePage()",100);     
+
+    </script>
+
+  </head>
+  <body onresize="adjustMapArea()">
+
+  <!-- Layout of page starts here -->
+  <div id="container" style="width:100%; height: 100%; margin: 0px">
+    <table width="100%"> 
+      <tr>
+	<td colspan="2">
+          <div id="header">
+            <table width="100%">
+              <tr>
+		<td width="15%">
+		  <div id="padding">
+            &nbsp;
+		  </div>
+                </td>
+                <td style="text-align: center;" width="85%">
+                  <h1 id="maintitle">Leaflet Example 2 - Pawin</h1>
+		</td>
+	      </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td width="15%">
+            <div id="control_panel" style="text-align: center; padding: 30px;">
+                <button id="tourismButton" onclick="manageTourismLayer()">
+                    Show Tourist Sites
+                </button>
+            </div>
+
+            <div id="searchBox">
+                <label for="searchInput">Search a location</label>
+                <input type="text" id="searchInput" placeholder="Search a location">
+                <button onclick="findTourismFeature()">Search</button>
+            </div>
+        </td>
+        <td>
+	  <div id="map-canvas" style="height: 300px;">
+	    <!-- Leaflet requires that the map have a defined height -->
+          </div>
+        </td>
+      </tr>
+    </table>
+    </div>  <!-- container -->
+    
+  </body>
+</html>

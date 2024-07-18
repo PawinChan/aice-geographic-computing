@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <!-- <meta name="color-scheme" content="dark light"> -->
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""/>
+
+   <!-- Make sure you put this AFTER Leaflet's CSS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""></script>
+
+  <link rel="stylesheet" 
+  href="https://cdn.jsdelivr.net/npm/water.css@2.1.1/out/water.min.css" 
+  integrity="sha256-QST90Wzz4PEr5KlclQaOCsjc00FTyf86Wrj41oqZB4w=" 
+  crossorigin="anonymous">
+
+  <link rel="preload" as="fetch" href="./data.json">
+  
+  <script src="./leaflet-icons.js"></script>
+  <script src="./script.js"></script>
+  <link rel="stylesheet" href="./styles.css">
+  <!-- link watercss -->
+
+</head>
+<body>
+  <div id="content">
+    <div id="panel">
+      <h1>Gas Stations</h1>
+      <p id="locationStatus">Loading your location...</p>
+      <div id="statistics"></div>
+
+      <hr width="90%" align="left">
+
+      <div id="inputArea">
+        <label for="filterByBrand">Filter by brand</label>
+        <br>
+        <select id="filterByBrand">
+          <option value="all" selected>All</option>
+          <option value="ptt">PTT</option>
+          <option value="bangchak">Bangchak</option>
+          <option value="shell">Shell</option>
+          <option value="caltex">Caltex</option>
+          <option value="pt">PT</option>
+
+        </select>
+        <button onclick="reCenter()" align="center">Re-center</button>
+      </div>
+    </div>
+    <div id="map"></div>
+  </div>
+  
+</body>
+</html>

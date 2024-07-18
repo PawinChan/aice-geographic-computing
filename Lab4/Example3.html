@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Geographic Computing HTML and JavaScript Example 3</title>
+<!-- Shows how execute a GET request using JavaScript and Ajax.
+     to get the latitude and longitude for a street address
+     then display in a div on the page. 
+     Also shows how we can manipulate the DOM to create a "Clear"
+     button.
+
+    Modified by: Pawin
+-->
+
+<script>
+
+    // Function to clear the text in the address and results fields
+    // Then deletes the clear button from the page
+    function clearAllText()
+    {
+        var addr = document.getElementById("address");
+        var results = document.getElementById("resultDiv")
+        addr.value = "";
+        resultDiv.innerHTML="";
+        // delete the button
+        btn = document.getElementById("clearButton");
+        if (btn)
+        {
+            btn.remove();
+        }
+    }
+
+    // JavaScript can modify the content of a page... 
+    // not just by changing attributes or style but by
+    // creating or removing HTML elements.
+    function createClearButton()
+    {
+        var btn = document.createElement("BUTTON");
+        btn.id="clearButton";
+        var title = document.createTextNode("Clear Text");
+        var buttonDiv = document.getElementById("buttondiv");
+        btn.appendChild(title);
+        buttonDiv.appendChild(btn);
+        btn.addEventListener("click",clearAllText);   
+    }
+   
+    // get the latitude and longitude (first one returned) for
+    // an address. 
+    function getLatLongForAddress()
+    {
+        // Get lat and long for an address entered by the user
+        // First get the address
+        console.log("Entered getLatLongForAddress");
+        var address = document.getElementById("address").value;
+        if (address.length == 0)
+        {
+            alert("Please enter a street address!");
+            return;
+        }
+        var encodedAddress = encodeURIComponent(address);  // changes blanks to hex etc.
+        // now construct the URL for the API call
+        var requestString = "http://api.positionstack.com/v1/forward?access_key=7a73b1d3c8e00049940dad4af0ce6844&query=" + 
+            encodedAddress;
+        console.log("Request string: "+ requestString);
+        var request = new XMLHttpRequest();
+        request.open("GET", requestString, true);
+        request.setRequestHeader("accept", "application/json"); 
+        request.send(null);  
+        // Register a handler to take care of the data on return
+        request.onreadystatechange = function ()
+        {
+            if (request.readyState == 4)
+            {
+                console.log("Ready State is 4");
+                console.log("Request status is " + request.status);
+                if ((request.status == 200) || (request.status == 201))
+                {
+                    // If we get here, we got a complete valid HTTP response
+                    var response = request.responseText;
+                    var returnInfo = JSON.parse(response);
+                    var latitude = returnInfo.data[0].latitude;
+                    var longitude = returnInfo.data[0].longitude;
+                    var country = returnInfo.data[0].country;
+                    var resultDiv = document.getElementById("resultDiv");
+                    resultDiv.innerHTML="<h4>First set of coordinates returned: "+ latitude + "," + longitude + "," + country + "</h4>";
+    
+                }
+                else
+                {
+                    alert("Request returned error status: "+ request.status);
+                }
+            } // end if 200/201 *
+            else
+            {
+                console.log("Not ready yet");
+                // request isn't ready yet
+            }
+        }
+        createClearButton(); 
+        return true;
+    }    
+
+
+    async function getAddressForLatLong() {
+        var address = document.getElementById("address2").value;
+        if (address.length == 0) {
+            alert("Please enter a coordinate");
+            return;
+        }
+        var encodedAddress = encodeURIComponent(address);  // changes blanks to hex etc.
+        // now construct the URL for the API call
+        var requestString = "http://api.positionstack.com/v1/reverse?access_key=7a73b1d3c8e00049940dad4af0ce6844&query=" + encodedAddress;
+        console.log("Request string: "+ requestString);
+
+        response = await fetch(requestString)
+        if (response.ok) {
+            data = await response.json()
+            console.log(data)
+                var resultDiv = document.getElementById("resultDiv2");
+                resultDiv.innerHTML = data['data'][0]['label'];
+
+        } else {
+            console.error(await response.text());
+            alert("HTTP-Error: " + response.status);
+        }
+
+
+    }
+</script>
+</head>
+
+<body style="background-color: #eeddff;">
+<h2 style="text-align: center;">Geographic Computing HTML and JavaScript Example 3<h2>
+<h2 style="text-align: center;">ตัวอย่าง 3</h2>
+
+    <div id="querydiv" style="background-color: aliceblue; text-align: center; 
+        padding: 20px; position: absolute; left: 50%; transform: translate(-50%,0%);">
+        <h3>Get latitude and longitude coordinates for an address</h3><br><br>
+        <label for="address"><b>Enter free-form address</b></label><br><br>
+        <input name="address" id="address" size="60"></input><br><br>
+        <div id="buttondiv">
+            <button type="button" onclick="getLatLongForAddress()">Get Lat/Long</button>
+            <br><br>
+        </div>    
+        <div id="resultDiv" style="background-color: white; padding: 10px;">
+        </div>
+
+        <h3>Get address from lat/long</h3><br><br>
+        <label for="address"2><b>Enter lat/long address</b></label><br><br>
+        <input name="address2" id="address2" size="60"></input><br><br>
+        <div id="buttondiv2">
+            <button type="button" onclick="getAddressForLatLong()">Get Human-readable address</button>
+            <br><br>
+        </div>    
+        <div id="resultDiv2" style="background-color: white; padding: 10px;">
+    </div>
+
+</div>
+</body>
+</html>

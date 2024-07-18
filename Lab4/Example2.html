@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Geographic Computing HTML Example 2</title>
+<!-- Shows how execute a GET request from an HTML form.
+     This request calls the PositionStack Forward Geocoding API
+     Note that all the parameters to the API call must be associated with
+     <input> elements in the form. Note also that the results are
+     displayed as raw JSON in a page that replaces the current page.
+
+     Modified by: Pawin
+-->
+</head>
+<body style="background-color: lightyellow;">
+<h2 style="text-align: center;">Geographic Computing HTML Example 2<h2>
+<h2 style="text-align: center;">ตัวอย่าง 2</h2>
+<div id="formdiv" style="background-color: lightblue; text-align: center; 
+     padding: 20px; position: absolute; left: 50%; transform: translate(-50%,0%);">
+  <h3>Get the latitude and longitude for an address</h3>
+  <h4>(Uses the PositionStack.com API)</h4><br><br>
+  <form action="http://api.positionstack.com/v1/forward" method="get" enctype="text/plain">
+    <label for="query"><b>Enter free-form address</b></label><br>
+    <input name="query" id="query" type="text" size="60"><br><br>
+    <input name="country" id="country" type="hidden" value="US">
+    <input name="access_key" type="hidden" value="7a73b1d3c8e00049940dad4af0ce6844">
+    <br>
+    <input type="submit" value="Submit">
+  </form> 
+</div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+body {
+  font-family: sans-serif;
+  max-width: unset;
+  overflow: hidden;
+}
+
+#content {
+  display: flex;
+  flex-direction: row;
+  padding: 1em;
+}
+
+#panel {
+  width: 25vw;
+  min-width: 18em;
+}
+
+
+#map {
+  width: 70vw;
+  height: 90vh;
+}
+
+select, button {
+  display: block;
+  margin: auto;
+  width: 14em;
+  margin: 0.6em;
+}

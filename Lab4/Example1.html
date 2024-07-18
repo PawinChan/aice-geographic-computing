@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Geographic Computing HTML Example 1</title>
+<!-- Shows how to invoke a CGI script from an HTML form.
+     Shows ultra-simple JavaScript event handling
+     Also shows a direct hyperlink and some very basic styling
+
+     Modified by: Pawin
+-->
+    <script type="text/javascript">
+
+      var currentColor = "white";
+      function changeColor()
+      {
+        var button = document.getElementById("colorbutton");
+        if ((currentColor == "white") || (currentColor == "yellow"))
+        {
+          button.innerHTML = "Change to Green";
+          currentColor = "blue";
+          document.body.style.backgroundColor = "lightskyblue";
+        }
+        else if (currentColor == "blue")
+        {
+          button.innerHTML = "Change to Yellow";
+          currentColor = "green";
+          document.body.style.backgroundColor = "green";
+        }
+        else if (currentColor == "green")
+        {
+          button.innerHTML = "Change to Blue";
+          currentColor = "yellow";
+          document.body.style.backgroundColor = "yellow";
+        }
+      }
+
+      /* Change the starting background color */  
+      function initializePage()
+      {
+         document.body.style.backgroundColor = "#ffffff";
+         currentColor = "white";
+      }
+      window.onload = setTimeout("initializePage()",100);
+    </script>
+</head>
+
+<body style="background-color: #ffffff">
+  <h2 style="text-align: center;">HTML Example 1<h2>
+  <h2 style="text-align: center;">ตัวอย่าง 1</h2>
+  <p style="text-align: center;">This is an example of a basic hyperlink using the <b>&lt;a&gt;</b> tag. Click the link below to visit the CMKL website.</p>
+  <p style="text-align: center;"><a href="http://sk.ac.th" target="_blank">Suankularb Wittiyalai School</a></p>
+  <div id="formdiv" style="background-color: #ffffaa; text-align: center; padding: 20px;">
+    <h3>Open Dragon Contact Page</h3>
+      <form action="http://open-dragon.org/cgi-bin/contactUs.pl" target="_blank"> 
+        <label for="email">Enter your email</label><br>
+        <input name="email" id="email" type="text"><br><br><br>
+        <input name="mode" id="mode" type="hidden" value="info">
+        <input type="submit" value="Contact Us">
+        <br><br>
+      </form> 
+  </div>
+  <div id="buttondiv" style="text-align: center; padding: 40px;">
+    <div style="width: 30%; margin: auto;">
+      <button id="colorbutton" 
+              style="margin:auto; display: block; width: 30%;" 
+              onclick="changeColor()">Change to green
+      </button> 
+    </div>
+  </div>
+</body>
+</html>

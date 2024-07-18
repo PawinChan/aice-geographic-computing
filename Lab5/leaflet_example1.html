@@ -1,0 +1,178 @@
+<!DOCTYPE html> 
+<html>
+<!--
+  --  Simple example of Leaflet map embedding
+  --  Uses OSM data plus example at:
+  --   http://leafletjs.com/examples/quick-start/
+  --  Created by Sally Goldin, 13 September 2017
+  --  Updated for AiCE Warp, 28 June 2023
+  -->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      .center { margin: auto; }
+      html { height: 100%; margin: 0px; padding: 0px; }
+      body { height: 100%; margin: 0px; padding: 0px;
+             background-color:#DDFFFF;
+             font-family: sans-serif;
+           }
+      #header         { background-color: #DDFFFF;
+                        margin: 0px;
+                        padding: 0px;
+                        text-align: center;
+                        line-height: 150%;
+                        }
+      #map-canvas    { 
+                        width: 95%; 
+                        height: 500px;
+                        border-style: inset; 
+                        border-width: 4px 
+                     }
+
+      #titlebar      {
+                        width : 100%;
+                        height : 20px;
+                        background-color : #DDDDDD;
+                        border-style: solid;
+                        border-width: 2px;
+                        border-color: black;
+                     }
+
+    </style>
+    <!-- Leaflet CSS stylesheet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>    
+    <!-- Leaflet JS library -->
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <script type="text/javascript">
+      var map = null;   /* want to be able to see outside of initialize */  
+    /* Initialize the map. Right now we use an arbitrary  
+     * center point in Amphawa.
+     */
+    function initialize() 
+    {
+        map = L.map('map-canvas').setView([37.7749,-122.4194],14);
+
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+           attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap           </a> contributors'
+           }).addTo(map);
+    }
+
+    /* Revise the width and height of the map area to be completely
+     * visible on the screen.
+     */
+    function adjustMapArea()
+    {
+        var elem = (document.compatMode === "CSS1Compat") ? 
+                  document.documentElement :
+                  document.body;
+        var pgheight = elem.clientHeight;
+        var pgwidth = elem.clientWidth;         
+        var header= document.getElementById("header");
+        var cparea= document.getElementById("control_panel");
+        var maparea = document.getElementById("map-canvas");
+        var box = header.getBoundingClientRect();
+        var headerheight = box.height || (box.bottom - box.top);
+        box = cparea.getBoundingClientRect();
+        var controlwidth = box.width || (box.right - box.left);
+        var margin = 40;  /* fix this if we decide to change the layout */
+        var newwidth = pgwidth - controlwidth - margin;
+        var newheight = pgheight - headerheight - margin/2;
+        maparea.style.width = newwidth+"px"; 
+        maparea.style.height = newheight+"px";
+    } 
+
+    /* Size the map area to fit the page and update the strings */  
+    function initializePage()
+    {
+        adjustMapArea(); // set the size first, otherwise some of the map
+                         // does not display
+        initialize();
+    }
+
+    function flyToLocation() {
+      [lat, lng] = [document.getElementById("latInput").value, document.getElementById("lonInput").value].map(parseFloat);
+      if (isNaN(lat) || isNaN(lng)){
+        alert("Please enter both latitude and longitude");
+        return;
+      }
+      map.flyTo([lat, lng]);
+    }
+
+    async function searchPlace(query) {
+      // let input = document.getElementById('search-input').value
+      let resp  = await fetch(`https://nominatim.openstreetmap.org/search?q=${query.trim()}&format=json`, { cache: "force-cache" })
+      let data = await resp.json()
+      console.log("Search completed.")
+      console.log(data)
+      return data
+    }
+
+    async function searchLocation() {
+      let query = document.getElementById("searchInput").value
+      let data = await searchPlace(query)
+      if (data.length == 0) {
+        alert("No result found.")
+        return
+      }
+      let [lat, lon] = [data[0].lat, data[0].lon]
+      map.flyTo([lat, lon])
+    }
+
+    window.onload = setTimeout("initializePage()",100);     
+
+    </script>
+  </head>
+  <body onresize="adjustMapArea()">
+
+  <!-- Layout of page starts here -->
+  <div id="container" style="width:100%; height: 100%; margin: 0px">
+    <table width="100%"> 
+      <tr>
+      	<td colspan="2">
+          <div id="header">
+            <table width="100%">
+              <tr>
+		            <td width="15%">
+		              <div id="padding">
+                   &nbsp;
+		              </div>
+                </td>
+                <td style="text-align: center;" width="85%">
+                  <h1 id="maintitle">Leaflet Example 1 - Pawin</h1>
+		            </td>
+	           </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td width="15%">
+          <div id="control_panel">
+            <input type="text" id="latInput" placeholder="Latitude">
+            <input type="text" id="lonInput" placeholder="Longitude">
+            <button onclick="flyToLocation()">Go</button>
+            <br><br><br>
+            <input type="text" id="searchInput" placeholder="Search a location">
+            <button onclick="searchLocation()">Search</button>
+            
+          </div>
+        </td>
+        <td>
+          <div id="map-canvas" style="height: 300px;">
+	           <!-- Leaflet requires that the map have a defined height -->
+               
+          </div>
+        </td>
+      </tr>
+    </table>
+    </div>  <!-- container -->
+    
+  </body>
+</html>
