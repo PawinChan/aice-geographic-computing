@@ -27,3 +27,7 @@ select, button {
   width: 14em;
   margin: 0.6em;
 }
+
+table {
+  width: 95%;
+}
